@@ -29,15 +29,33 @@ class ColorPickerPage extends StatefulWidget {
 }
 
 class _ColorPickerPageState extends State<ColorPickerPage> {
+  Color selectedColor = Colors.red;
+
+  final Map<Color, String> renkler = {
+    Colors.red: 'Kırmızı',
+    Colors.blue: 'Mavi',
+    Colors.green: 'Yeşil',
+    Colors.yellow: 'Sarı',
+    Colors.purple: 'Mor',
+  };
+  bool isCircular = false;
+  bool isShowColorName = true;
+  void _containerSekliniDegistir() {
+    setState(() {
+      isCircular = !isCircular;
+    });
+  }
+
   void _renginKodunuGoster() {
     Fluttertoast.showToast(
-      msg: "This is Center Short Toast",
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.CENTER,
+      msg:
+          "RGB: (${selectedColor.red}, ${selectedColor.green}, ${selectedColor.blue})",
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.BOTTOM,
       timeInSecForIosWeb: 1,
-      backgroundColor: Colors.red,
+      backgroundColor: selectedColor,
       textColor: Colors.white,
-      fontSize: 16.0,
+      fontSize: 18.0,
     );
   }
 
@@ -51,20 +69,47 @@ class _ColorPickerPageState extends State<ColorPickerPage> {
     });
   }
 
-  Color selectedColor = Colors.red;
-
-  final Map<Color, String> renkler = {
-    Colors.red: 'Kırmızı',
-    Colors.blue: 'Mavi',
-    Colors.green: 'Yeşil',
-    Colors.yellow: 'Sarı',
-    Colors.purple: 'Mor',
-  };
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Renk Seçici'), centerTitle: true),
+      appBar: AppBar(
+        title: Text('Renk Seçici'),
+        centerTitle: true,
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              setState(() {
+                isShowColorName = !isShowColorName;
+              });
+            },
+            itemBuilder: (context) {
+              return [
+                PopupMenuItem(
+                  value: 'a',
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        isShowColorName
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        size: 20,
+                        color: Colors.black,
+                      ),
+                      SizedBox(width: 8),
+
+                      isShowColorName
+                          ? Text('Renk Adını Gizle')
+                          : Text('Renk Adını Göster'),
+                    ],
+                  ),
+                ),
+              ];
+            },
+            icon: Icon(Icons.more_vert),
+          ),
+        ],
+      ),
       body: Center(
         child: Column(
           children: [
@@ -74,7 +119,7 @@ class _ColorPickerPageState extends State<ColorPickerPage> {
               height: 300,
               decoration: BoxDecoration(
                 color: selectedColor,
-                borderRadius: BorderRadius.circular(25),
+                borderRadius: BorderRadius.circular(isCircular ? 300 : 10),
                 boxShadow: [
                   BoxShadow(
                     color: selectedColor.withOpacity(0.5),
@@ -85,7 +130,7 @@ class _ColorPickerPageState extends State<ColorPickerPage> {
               ),
             ),
             SizedBox(height: 10),
-            Text(renkler[selectedColor]!),
+            isShowColorName ? Text(renkler[selectedColor]!) : SizedBox(),
             Padding(
               padding: const EdgeInsets.all(15.0),
               child: Row(
@@ -120,8 +165,12 @@ class _ColorPickerPageState extends State<ColorPickerPage> {
                     icon: Icon(Icons.info),
                   ),
                   IconButton(
-                    onPressed: () {},
-                    icon: Icon(Icons.circle_outlined),
+                    onPressed: () {
+                      _containerSekliniDegistir();
+                    },
+                    icon: Icon(
+                      isCircular ? Icons.circle_rounded : Icons.circle_outlined,
+                    ),
                   ),
                 ],
               ),
